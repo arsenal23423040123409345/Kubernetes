@@ -1,7 +1,8 @@
-using CommandService.AsyncDataServices;
 using CommandService.Data;
+using CommandService.DataServices.Async.MessageBus;
+using CommandService.DataServices.Sync.gRPC;
 using CommandService.EventProcessing;
-using CommandService.SyncDataServices.gRPC;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,6 +14,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+builder.Services.AddMediatR(AppDomain.CurrentDomain.GetAssemblies());
 
 builder.Services.AddScoped<ICommandRepository, CommandRepository>();
 builder.Services.AddSingleton<IEventProcessor, EventProcessor>();

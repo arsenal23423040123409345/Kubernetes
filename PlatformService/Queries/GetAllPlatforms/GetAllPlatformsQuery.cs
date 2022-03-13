@@ -3,6 +3,4 @@ using PlatformService.Models;
 
 namespace PlatformService.Queries.GetAllPlatforms;
 
-public class GetAllPlatformsQuery : IRequest<List<Platform>>
-{
-}
+public record GetAllPlatformsQuery : IRequest<List<Platform>>;

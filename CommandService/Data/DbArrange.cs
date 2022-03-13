@@ -1,11 +1,11 @@
-﻿using CommandService.Models;
-using CommandService.SyncDataServices.gRPC;
+﻿using CommandService.DataServices.Sync.gRPC;
+using CommandService.Models;
 
 namespace CommandService.Data;
 
 public static class DbArrange
 {
-    public static void PopulateData(IApplicationBuilder app)
+    public static async Task PopulateData(IApplicationBuilder app)
     {
         using var serviceScope = app.ApplicationServices.CreateScope();
 
@@ -13,10 +13,10 @@ public static class DbArrange
 
         var platforms = grpcClient.ReturnAllPlatforms();
 
-        SeedData(serviceScope.ServiceProvider.GetService<ICommandRepository>(), platforms);
+        await SeedData(serviceScope.ServiceProvider.GetService<ICommandRepository>(), platforms);
     }
 
-    private static void SeedData(ICommandRepository? repository, IEnumerable<Platform>? platforms)
+    private static async Task SeedData(ICommandRepository? repository, IEnumerable<Platform>? platforms)
     {
         Console.WriteLine("--> Seeding new platforms");
 
@@ -24,9 +24,9 @@ public static class DbArrange
         {
             foreach (var platform in platforms)
             {
-                if (!repository.ExternalPlatformExists(platform.ExternalId))
+                if (!await repository.ExternalPlatformExistsAsync(platform.ExternalId))
                 {
-                    repository.CreatePlatform(platform);
+                    repository.CreatePlatformAsync(platform);
                 }
             }
         }

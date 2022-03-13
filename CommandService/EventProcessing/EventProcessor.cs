@@ -17,7 +17,7 @@ public class EventProcessor : IEventProcessor
         _mapper = mapper;
     }
 
-    public void ProcessEvent(string message)
+    public async Task ProcessEventAsync(string message)
     {
         Console.WriteLine("--> Determining Event");
 
@@ -26,7 +26,7 @@ public class EventProcessor : IEventProcessor
         switch (eventType)
         {
             case EventType.PlatformPublished:
-                AddPlatform(message);
+                await AddPlatform(message);
                 break;
             case EventType.Undetermined:
                 break;
@@ -40,7 +40,7 @@ public class EventProcessor : IEventProcessor
             _ => EventType.Undetermined,
         };
 
-    private void AddPlatform(string platformPublishedMessage)
+    private async Task AddPlatform(string platformPublishedMessage)
     {
         using var scoped = _scopeFactory.CreateScope();
 
@@ -51,9 +51,9 @@ public class EventProcessor : IEventProcessor
         {
             var platform = _mapper.Map<Platform>(platformPublishedDto);
 
-            if (!repository.ExternalPlatformExists(platform.ExternalId))
+            if (!await repository.ExternalPlatformExistsAsync(platform.ExternalId))
             {
-                repository.CreatePlatform(platform);
+                repository.CreatePlatformAsync(platform);
 
                 Console.WriteLine("--> Platform added successfully");
             }

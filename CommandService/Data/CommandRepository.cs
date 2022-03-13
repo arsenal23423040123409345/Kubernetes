@@ -1,4 +1,5 @@
 ﻿using CommandService.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace CommandService.Data;
 
@@ -11,7 +12,7 @@ public class CommandRepository : ICommandRepository
         _context = context;
     }
 
-    public async Task CreateCommand(int platformId, Command command)
+    public async Task CreateCommandAsync(int platformId, Command command)
     {
         if (command is null)
         {
@@ -24,7 +25,7 @@ public class CommandRepository : ICommandRepository
         await _context.SaveChangesAsync();
     }
 
-    public async Task CreatePlatform(Platform platform)
+    public async Task CreatePlatformAsync(Platform platform)
     {
         if (platform is null)
         {
@@ -35,22 +36,22 @@ public class CommandRepository : ICommandRepository
         await _context.SaveChangesAsync();
     }
 
-    public IEnumerable<Platform> GetAllPlatforms() 
-        => _context.Platforms.ToList();
+    public Task<List<Platform>> GetAllPlatformsAsync() 
+        => _context.Platforms.ToListAsync();
 
-    public Command? GetCommand(int platformId, int commandId) 
+    public Task<Command?> GetCommandAsync(int platformId, int commandId) 
         => _context.Commands
-            .FirstOrDefault(x => x.PlatformId == platformId && x.Id == commandId);
+            .FirstOrDefaultAsync(x => x.PlatformId == platformId && x.Id == commandId);
 
-    public IEnumerable<Command> GetCommandsForPlatform(int platformId) 
+    public Task<List<Command>> GetCommandsForPlatformAsync(int platformId) 
         => _context.Commands
             .Where(x => x.PlatformId == platformId)
             .OrderBy(x => x.Platform.Name)
-            .ToList();
+            .ToListAsync();
 
-    public bool PlatformExist(int platformId) 
-        => _context.Platforms.Any(x => x.Id == platformId);
+    public Task<bool> PlatformExistAsync(int platformId) 
+        => _context.Platforms.AnyAsync(x => x.Id == platformId);
 
-    public bool ExternalPlatformExists(int externalPlatformId) 
-        => _context.Platforms.Any(x => x.ExternalId == externalPlatformId);
+    public Task<bool> ExternalPlatformExistsAsync(int externalPlatformId) 
+        => _context.Platforms.AnyAsync(x => x.ExternalId == externalPlatformId);
 }

@@ -3,7 +3,7 @@ using CommandService.EventProcessing;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 
-namespace CommandService.AsyncDataServices;
+namespace CommandService.DataServices.Async.MessageBus;
 
 public class MessageBusSubscriber : BackgroundService
 {
@@ -39,7 +39,7 @@ public class MessageBusSubscriber : BackgroundService
 
         var subscriber = new EventingBasicConsumer(_channel);
 
-        subscriber.Received += (_, ea) =>
+        subscriber.Received += async (_, ea) =>
         {
             Console.WriteLine("--> Event received");
 
@@ -47,7 +47,7 @@ public class MessageBusSubscriber : BackgroundService
 
             var notificationMessage = Encoding.UTF8.GetString(body.ToArray());
 
-            _eventProcessor.ProcessEvent(notificationMessage);
+            await _eventProcessor.ProcessEventAsync(notificationMessage);
         };
 
         _channel.BasicConsume(_queueName, true, subscriber);
