@@ -1,10 +1,13 @@
 ﻿using AutoMapper;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using PlatformService.AsyncDataServices;
-using PlatformService.Data;
+using PlatformService.Commands.CreatePlatform;
+using PlatformService.DataServices.Async.MessageBus;
+using PlatformService.DataServices.Sync.Http;
 using PlatformService.Dtos;
 using PlatformService.Models;
-using PlatformService.SyncDataServices.Http;
+using PlatformService.Queries.GetAllPlatforms;
+using PlatformService.Queries.GetPlatformById;
 
 namespace PlatformService.Controllers;
 
@@ -12,35 +15,35 @@ namespace PlatformService.Controllers;
 [ApiController]
 public class PlatformController : ControllerBase
 {
-    private readonly IPlatformRepository _repository;
     private readonly IMapper _mapper;
     private readonly ICommandDataClient _commandDataClient;
     private readonly IMessageBusClient _messageBusClient;
+    private readonly IMediator _mediator;
 
     public PlatformController(
-        IPlatformRepository repository,
-        IMapper mapper, 
+        IMapper mapper,
         ICommandDataClient commandDataClient,
-        IMessageBusClient messageBusClient)
+        IMessageBusClient messageBusClient,
+        IMediator mediator)
     {
-        _repository = repository;
         _mapper = mapper;
         _commandDataClient = commandDataClient;
         _messageBusClient = messageBusClient;
+        _mediator = mediator;
     }
 
     [HttpGet]
-    public ActionResult<IEnumerable<PlatformReadDto>> GetAllPlatforms()
+    public async Task<ActionResult<IEnumerable<PlatformReadDto>>> GetAllPlatforms()
     {
-        var platforms = _repository.GetAllPlatforms();
+        var platforms = await _mediator.Send(new GetAllPlatformsQuery());
 
         return Ok(_mapper.Map<IEnumerable<PlatformReadDto>>(platforms));
     }
 
-    [HttpGet("{id:int}", Name = "GetPlatformById")]
-    public ActionResult<PlatformReadDto> GetPlatformById(int id)
+    [HttpGet("{id:int}", Name = "GetPlatformByIdAsync")]
+    public async Task<ActionResult<PlatformReadDto>> GetPlatformById(int id)
     {
-        var platform = _repository.GetPlatformById(id);
+        var platform = await _mediator.Send(new GetPlatformByIdQuery(id));
 
         return platform is not null
             ? Ok(_mapper.Map<PlatformReadDto>(platform))
@@ -52,8 +55,7 @@ public class PlatformController : ControllerBase
     {
         var platformModel = _mapper.Map<Platform>(platformWriteDto);
 
-        _repository.CreatePlatform(platformModel);
-        _repository.SaveChanges();
+        await _mediator.Send(new CreatePlatformCommand(platformModel));
 
         var platformReadDto = _mapper.Map<PlatformReadDto>(platformModel);
 
@@ -62,7 +64,7 @@ public class PlatformController : ControllerBase
         {
             await _commandDataClient.SendPlatformToCommand(platformReadDto);
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             Console.WriteLine($"--> Could not send synchronously {e.Message}");
         }

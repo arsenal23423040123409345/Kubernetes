@@ -1,8 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
-using PlatformService.AsyncDataServices;
+﻿using MediatR;
+using Microsoft.EntityFrameworkCore;
 using PlatformService.Data;
-using PlatformService.SyncDataServices.gRPC;
-using PlatformService.SyncDataServices.Http;
+using PlatformService.DataServices.Async.MessageBus;
+using PlatformService.DataServices.Sync.gRPC;
+using PlatformService.DataServices.Sync.Http;
 
 namespace PlatformService;
 
@@ -36,8 +37,6 @@ public class Startup
                 opt.UseInMemoryDatabase("InMem"));
         }
 
-        services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-
         services.AddScoped<IPlatformRepository, PlatformRepository>();
         services.AddSingleton<IMessageBusClient, MessageBusClient>();
 
@@ -45,7 +44,9 @@ public class Startup
 
         services.AddHttpClient<ICommandDataClient, CommandDataClient>();
 
-        Console.WriteLine($"--> CommandService Endpoint {Configuration["CommandService"]}");
+        services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
+        services.AddMediatR(AppDomain.CurrentDomain.GetAssemblies());
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

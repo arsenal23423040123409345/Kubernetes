@@ -1,6 +1,6 @@
 using PlatformService;
 using PlatformService.Data;
-using PlatformService.SyncDataServices.gRPC;
+using PlatformService.DataServices.Sync.gRPC;
 
 var builder = WebApplication.CreateBuilder(args);
 
