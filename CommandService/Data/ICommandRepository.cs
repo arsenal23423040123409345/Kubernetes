@@ -5,18 +5,18 @@ namespace CommandService.Data;
 public interface ICommandRepository
 {
     // Platforms
-    IEnumerable<Platform> GetAllPlatforms();
+    Task<List<Platform>> GetAllPlatformsAsync();
 
-    Task CreatePlatform(Platform platform);
+    Task CreatePlatformAsync(Platform platform);
 
-    bool PlatformExist(int platformId);
+    Task<bool> PlatformExistAsync(int platformId);
 
-    bool ExternalPlatformExists(int externalPlatformId);
+    Task<bool> ExternalPlatformExistsAsync(int externalPlatformId);
 
     // Commands
-    IEnumerable<Command> GetCommandsForPlatform(int platformId);
+    Task<List<Command>> GetCommandsForPlatformAsync(int platformId);
 
-    Command? GetCommand(int platformId, int commandId);
+    Task<Command?> GetCommandAsync(int platformId, int commandId);
 
-    Task CreateCommand(int platformId, Command command);
+    Task CreateCommandAsync(int platformId, Command command);
 }

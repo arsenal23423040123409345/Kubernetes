@@ -1,6 +1,7 @@
 using AutoMapper;
-using CommandService.Data;
 using CommandService.Dtos;
+using CommandService.Queries.GetAllPlatforms;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CommandService.Controllers;
@@ -9,23 +10,21 @@ namespace CommandService.Controllers;
 [ApiController]
 public class PlatformsController : ControllerBase
 {
-    private readonly ICommandRepository _repository;
     private readonly IMapper _mapper;
+    private readonly IMediator _mediator;
 
-    public PlatformsController(ICommandRepository repository, IMapper mapper)
+    public PlatformsController(IMapper mapper, IMediator mediator)
     {
-        _repository = repository;
         _mapper = mapper;
+        _mediator = mediator;
     }
 
     [HttpGet]
-    public ActionResult<IEnumerable<PlatformReadDto>> GetPlatforms()
+    public async Task<ActionResult<List<PlatformReadDto>>> GetPlatforms()
     {
-        Console.WriteLine("--> Getting Platforms from Command Service");
+        var platforms = await _mediator.Send(new GetAllPlatformsQuery());
 
-        var platforms = _repository.GetAllPlatforms();
-
-        return Ok(_mapper.Map<IEnumerable<PlatformReadDto>>(platforms));
+        return Ok(_mapper.Map<List<PlatformReadDto>>(platforms));
     }
 
     [HttpPost]

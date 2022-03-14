@@ -1,10 +1,9 @@
 ﻿using AutoMapper;
-using CommandService.Data;
 using CommandService.Models;
 using Grpc.Net.Client;
 using PlatformService;
 
-namespace CommandService.SyncDataServices.gRPC;
+namespace CommandService.DataServices.Sync.gRPC;
 
 public class PlatformDataClient : IPlatformDataClient
 {
