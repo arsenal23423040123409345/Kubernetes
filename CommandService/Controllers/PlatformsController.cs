@@ -1,5 +1,4 @@
 using AutoMapper;
-using CommandService.Data;
 using CommandService.Dtos;
 using CommandService.Queries.GetAllPlatforms;
 using MediatR;
@@ -11,13 +10,11 @@ namespace CommandService.Controllers;
 [ApiController]
 public class PlatformsController : ControllerBase
 {
-    private readonly ICommandRepository _repository;
     private readonly IMapper _mapper;
     private readonly IMediator _mediator;
 
-    public PlatformsController(ICommandRepository repository, IMapper mapper, IMediator mediator)
+    public PlatformsController(IMapper mapper, IMediator mediator)
     {
-        _repository = repository;
         _mapper = mapper;
         _mediator = mediator;
     }

@@ -14,24 +14,12 @@ public class CommandRepository : ICommandRepository
 
     public async Task CreateCommandAsync(int platformId, Command command)
     {
-        if (command is null)
-        {
-            throw new ArgumentNullException(nameof(command));
-        }
-
-        command.PlatformId = platformId;
-
         await _context.Commands.AddAsync(command);
         await _context.SaveChangesAsync();
     }
 
     public async Task CreatePlatformAsync(Platform platform)
     {
-        if (platform is null)
-        {
-            throw new ArgumentNullException(nameof(platform));
-        }
-
         await _context.Platforms.AddAsync(platform);
         await _context.SaveChangesAsync();
     }
